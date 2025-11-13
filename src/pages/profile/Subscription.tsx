@@ -25,10 +25,11 @@ interface Plan {
   color: string;
   badge?: string;
   features: string[];
-  revenue: number;
+  revenue?: number;
   reinvestment?: number;
   description: string;
   popular?: boolean;
+  isFree?: boolean;
 }
 
 const Subscription = () => {
@@ -37,6 +38,25 @@ const Subscription = () => {
 
   const plans: Plan[] = [
     {
+      id: "free",
+      name: "Free Plan",
+      price: 0,
+      period: "forever",
+      icon: Gift,
+      color: "muted",
+      isFree: true,
+      features: [
+        "Budget Tracker",
+        "Basic Reward System (limited scratch cards)",
+        "Basic Learning Modules",
+        "Parent Monitoring (limited view)",
+        "Can start 1 SIP goal only",
+        "Limited rewards",
+        "Basic analytics",
+      ],
+      description: "Perfect for getting started. Try all basic features for free!",
+    },
+    {
       id: "monthly",
       name: "Monthly Plan",
       price: 49,
@@ -44,11 +64,21 @@ const Subscription = () => {
       icon: Calendar,
       color: "primary",
       features: [
+        "Teen Smart Card (Virtual + Physical)",
+        "Unlimited SIP Investments",
+        "Multi-Instrument Investing (MF, Gold, RD, FD, Bonds, etc.)",
+        "Investment Auto-Optimization",
+        "Advanced Budgeting & Analytics",
+        "Unlimited Rewards & Challenges",
+        "Premium Learning Content",
+        "AI Finance Coaching",
+        "Investment Advisory",
+        "Parent Detailed Analytics",
+        "Personalized Insights",
         "Auto-renew every month",
         "No reinvestment required",
         "Full ₹49 = revenue",
         "Cancel anytime",
-        "Access to all basic features",
       ],
       revenue: 49,
       description: "Perfect for trying out Finzo. Pay monthly with no commitment.",
@@ -63,10 +93,22 @@ const Subscription = () => {
       badge: "Best Value",
       popular: true,
       features: [
+        "Teen Smart Card (Virtual + Physical)",
+        "Unlimited SIP Investments",
+        "Multi-Instrument Investing (MF, Gold, RD, FD, Bonds, Index Funds, Govt Schemes, ULIP)",
+        "Investment Auto-Optimization (Smart asset allocation, Rebalancing, Portfolio health)",
+        "Advanced Budgeting & Premium Analytics",
+        "Unlimited Rewards & All Challenges",
+        "Premium Learning Content",
+        "AI Finance & Wealth Advisor",
+        "Investment Advisory",
+        "Parent Detailed Analytics",
+        "Personalized Insights",
+        "Wealth Projections & Calculators",
+        "Better Rewards & Higher Multipliers",
         "Paid upfront - save more",
-        "₹51 automatically reinvested",
+        "₹51 automatically reinvested as micro-SIP",
         "₹448 = revenue",
-        "₹51 = mandatory investment (float + SIP)",
         "Earn SIP commission + float income",
         "Best value for money",
       ],
@@ -83,18 +125,31 @@ const Subscription = () => {
       color: "accent",
       badge: "Premium",
       features: [
+        "Teen Smart Card (Virtual + Physical)",
+        "Unlimited SIP Investments",
+        "Multi-Instrument Investing (All instruments + Blue-chip stocks for 18+)",
+        "Investment Auto-Optimization (Advanced)",
+        "Advanced Budgeting & Premium Analytics",
+        "Unlimited Rewards & All Challenges",
+        "Premium Learning Content",
+        "AI Finance & Wealth Advisor (Advanced)",
+        "Exclusive Investment Advisory",
+        "Parent Detailed Analytics (Full access)",
+        "Personalized Insights (Advanced)",
+        "Wealth Projections & Advanced Calculators",
+        "Best Rewards & Highest Multipliers",
+        "Priority Customer Support",
         "Renew every 6 months",
         "₹249 reinvested as mandatory SIP",
         "₹350 = revenue per 6 months",
         "SIP Commission on ₹249",
         "Float Interest Income on ₹249",
         "High ARPU (₹700/year revenue)",
-        "Premium advisory support",
-        "Priority customer service",
+        "Exclusive advisory features",
       ],
       revenue: 350,
       reinvestment: 249,
-      description: "Premium plan with advisory support and maximum reinvestment benefits.",
+      description: "Premium plan with exclusive advisory support and maximum reinvestment benefits.",
     },
   ];
 
@@ -102,13 +157,19 @@ const Subscription = () => {
     setSelectedPlan(planId);
     const plan = plans.find((p) => p.id === planId);
     if (plan) {
-      toast.success(`Selected ${plan.name}!`, {
-        description: `Proceeding to payment for ₹${plan.price}/${plan.period}`,
-      });
-      // In production, navigate to payment page
-      setTimeout(() => {
-        toast.info("Payment integration coming soon!");
-      }, 1500);
+      if (plan.isFree) {
+        toast.success(`Free Plan Activated!`, {
+          description: "You now have access to all free features.",
+        });
+      } else {
+        toast.success(`Selected ${plan.name}!`, {
+          description: `Proceeding to payment for ₹${plan.price}/${plan.period}`,
+        });
+        // In production, navigate to payment page
+        setTimeout(() => {
+          toast.info("Payment integration coming soon!");
+        }, 1500);
+      }
     }
   };
 
@@ -202,6 +263,7 @@ const Subscription = () => {
                           ${plan.color === "primary" ? "bg-primary/10" : ""}
                           ${plan.color === "success" ? "bg-success/10" : ""}
                           ${plan.color === "accent" ? "bg-accent/10" : ""}
+                          ${plan.color === "muted" ? "bg-muted" : ""}
                         `}
                       >
                         <Icon
@@ -210,6 +272,7 @@ const Subscription = () => {
                             ${plan.color === "primary" ? "text-primary" : ""}
                             ${plan.color === "success" ? "text-success" : ""}
                             ${plan.color === "accent" ? "text-accent" : ""}
+                            ${plan.color === "muted" ? "text-muted-foreground" : ""}
                           `}
                         />
                       </div>
@@ -222,38 +285,49 @@ const Subscription = () => {
 
                   {/* Pricing */}
                   <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-extrabold">
-                      {formatCurrency(plan.price)}
-                    </span>
-                    <span className="text-muted-foreground">/{plan.period}</span>
+                    {plan.isFree ? (
+                      <>
+                        <span className="text-3xl font-extrabold">Free</span>
+                        <span className="text-muted-foreground">/{plan.period}</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-3xl font-extrabold">
+                          {formatCurrency(plan.price)}
+                        </span>
+                        <span className="text-muted-foreground">/{plan.period}</span>
+                      </>
+                    )}
                   </div>
 
                   {/* Revenue Breakdown */}
-                  <div className="space-y-2 p-4 rounded-lg bg-muted/50">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Revenue:</span>
-                      <span className="font-semibold text-success">
-                        {formatCurrency(plan.revenue)}
-                      </span>
-                    </div>
-                    {plan.reinvestment && (
+                  {!plan.isFree && plan.revenue && (
+                    <div className="space-y-2 p-4 rounded-lg bg-muted/50">
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">Reinvestment:</span>
-                        <span className="font-semibold text-primary">
-                          {formatCurrency(plan.reinvestment)}
+                        <span className="text-muted-foreground">Revenue:</span>
+                        <span className="font-semibold text-success">
+                          {formatCurrency(plan.revenue)}
                         </span>
                       </div>
-                    )}
-                    {plan.reinvestment && (
-                      <div className="pt-2 border-t border-border">
-                        <p className="text-xs text-muted-foreground">
-                          {plan.reinvestment === 51
-                            ? "₹51 becomes a micro-SIP. You earn SIP commission + float income."
-                            : "₹249 reinvested as mandatory SIP. Earn SIP commission + float interest income."}
-                        </p>
-                      </div>
-                    )}
-                  </div>
+                      {plan.reinvestment && (
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">Reinvestment:</span>
+                          <span className="font-semibold text-primary">
+                            {formatCurrency(plan.reinvestment)}
+                          </span>
+                        </div>
+                      )}
+                      {plan.reinvestment && (
+                        <div className="pt-2 border-t border-border">
+                          <p className="text-xs text-muted-foreground">
+                            {plan.reinvestment === 51
+                              ? "₹51 becomes a micro-SIP. You earn SIP commission + float income."
+                              : "₹249 reinvested as mandatory SIP. Earn SIP commission + float interest income."}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   {/* Features */}
                   <div className="space-y-2">
@@ -272,16 +346,30 @@ const Subscription = () => {
                   <Button
                     onClick={() => handleSelectPlan(plan.id)}
                     className={`w-full rounded-full ${
-                      plan.popular
+                      plan.isFree
+                        ? "bg-muted hover:bg-muted/80"
+                        : plan.popular
                         ? "bg-primary hover:bg-primary/90"
                         : plan.id === "premium"
                         ? "bg-accent hover:bg-accent/90"
                         : ""
                     }`}
-                    variant={plan.popular ? "default" : plan.id === "premium" ? "default" : "outline"}
+                    variant={
+                      plan.isFree
+                        ? "secondary"
+                        : plan.popular
+                        ? "default"
+                        : plan.id === "premium"
+                        ? "default"
+                        : "outline"
+                    }
                     size="lg"
                   >
-                    {isSelected ? "Selected" : `Choose ${plan.name}`}
+                    {isSelected
+                      ? "Selected"
+                      : plan.isFree
+                      ? "Continue with Free"
+                      : `Choose ${plan.name}`}
                   </Button>
                 </div>
               </Card>
@@ -320,6 +408,84 @@ const Subscription = () => {
           </div>
         </Card>
 
+        {/* Feature Comparison Table */}
+        <Card className="p-6">
+          <h3 className="font-semibold mb-4">Free vs Paid Features Comparison</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left p-2 font-semibold">Feature</th>
+                  <th className="text-center p-2 font-semibold">Free Users</th>
+                  <th className="text-center p-2 font-semibold text-primary">Paid Users</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                <tr>
+                  <td className="p-2">Teen Card</td>
+                  <td className="p-2 text-center text-destructive">❌ No</td>
+                  <td className="p-2 text-center text-success">✔ Yes</td>
+                </tr>
+                <tr>
+                  <td className="p-2">Unlimited SIPs</td>
+                  <td className="p-2 text-center text-destructive">❌ No (1 only)</td>
+                  <td className="p-2 text-center text-success">✔ Yes</td>
+                </tr>
+                <tr>
+                  <td className="p-2">Advanced Budgeting</td>
+                  <td className="p-2 text-center text-destructive">❌ No</td>
+                  <td className="p-2 text-center text-success">✔ Yes</td>
+                </tr>
+                <tr>
+                  <td className="p-2">Premium Learning</td>
+                  <td className="p-2 text-center text-destructive">❌ No</td>
+                  <td className="p-2 text-center text-success">✔ Yes</td>
+                </tr>
+                <tr>
+                  <td className="p-2">Unlimited Rewards</td>
+                  <td className="p-2 text-center text-muted-foreground">⚠ Limited</td>
+                  <td className="p-2 text-center text-success">✔ Full</td>
+                </tr>
+                <tr>
+                  <td className="p-2">AI Finance Coaching</td>
+                  <td className="p-2 text-center text-destructive">❌ No</td>
+                  <td className="p-2 text-center text-success">✔ Yes</td>
+                </tr>
+                <tr>
+                  <td className="p-2">Investment Advisory</td>
+                  <td className="p-2 text-center text-destructive">❌ No</td>
+                  <td className="p-2 text-center text-success">✔ Yes</td>
+                </tr>
+                <tr>
+                  <td className="p-2">Parent Detailed Analytics</td>
+                  <td className="p-2 text-center text-destructive">❌ No</td>
+                  <td className="p-2 text-center text-success">✔ Yes</td>
+                </tr>
+                <tr>
+                  <td className="p-2">All Challenges</td>
+                  <td className="p-2 text-center text-muted-foreground">⚠ Limited</td>
+                  <td className="p-2 text-center text-success">✔ Unlimited</td>
+                </tr>
+                <tr>
+                  <td className="p-2">Personalized Insights</td>
+                  <td className="p-2 text-center text-destructive">❌ No</td>
+                  <td className="p-2 text-center text-success">✔ Yes</td>
+                </tr>
+                <tr>
+                  <td className="p-2">Multi-Instrument Investing</td>
+                  <td className="p-2 text-center text-destructive">❌ No</td>
+                  <td className="p-2 text-center text-success">✔ Yes</td>
+                </tr>
+                <tr>
+                  <td className="p-2">Investment Auto-Optimization</td>
+                  <td className="p-2 text-center text-destructive">❌ No</td>
+                  <td className="p-2 text-center text-success">✔ Yes</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </Card>
+
         {/* FAQ */}
         <Card className="p-6">
           <h3 className="font-semibold mb-4">Frequently Asked Questions</h3>
@@ -343,6 +509,13 @@ const Subscription = () => {
               <p className="text-muted-foreground">
                 When your reinvestment amount is used for SIP, you earn commission on that
                 investment, creating additional value.
+              </p>
+            </div>
+            <div>
+              <p className="font-medium mb-1">What is Teen Smart Card?</p>
+              <p className="text-muted-foreground">
+                Teen Smart Card is a physical + virtual card that allows spending anywhere via UPI
+                and card, with category-based controls, parental controls, and instant notifications.
               </p>
             </div>
           </div>
